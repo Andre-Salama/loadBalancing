@@ -45,18 +45,21 @@ public class BalancerClient implements Runnable {
                             }
                         }
                         max = 0;
-                        lastIndex = index;
-                        data[3] += Balancer.stores.get(index).getName() + " ";
-                        Balancer.stores.get(index).getOutputStream().writeObject(item);
-                        Balancer.stores.get(index).getOutputStream().flush();
-                        //
-                        //
-                        storage = Balancer.stores.get(index).getStorageSize() - item.getSize();
-                        Balancer.stores.get(index).setStorageSize(storage);
-                        Balancer.gui.getStores()[index].setText(storage + "");
+                        if (index != lastIndex) { //prevents duplication of data on a server
+                            lastIndex = index;
+                            data[3] += Balancer.stores.get(index).getName() + " ";
+                            Balancer.stores.get(index).getOutputStream().writeObject(item);
+                            Balancer.stores.get(index).getOutputStream().flush();
+                            //
+                            //
+                            storage = Balancer.stores.get(index).getStorageSize() - item.getSize();
+                            Balancer.stores.get(index).setStorageSize(storage);
+                            Balancer.gui.getStores()[index].setText(storage + "");
+                        }
                     }
                 }
-                table.addRow(data);
+                if (index != -1) //prevents an empty record from being added to the table when no store is available
+                    table.addRow(data);
             }
             catch (Exception e) {
                 e.printStackTrace();
